@@ -1,4 +1,4 @@
-part of web3_ethereum;
+part of 'web3_ethereum.dart';
 
 /// getter JavaScript global object [ethereum]
 @JS('ethereum')
@@ -23,4 +23,18 @@ class _RequestArguments {
   external String get method;
 
   external Object? get params;
+}
+
+/// If ethereum.request throw error, this class parse JavaScript object with error data
+@JS()
+@anonymous
+class _RequestError {
+  external factory _RequestError({
+    required String code,
+    required String message,
+  });
+
+  external int get code;
+
+  external String get message;
 }
