@@ -31,37 +31,39 @@ Object _mapToJSObj(Map<dynamic, dynamic> a) {
 bool _nullToUndefinedFilter(dynamic item) {
   return item != null;
 }
-
-/// Convert JS object to Dart object to avoid type error.
-class _ParsedError {
-  final int code;
-  final String message;
-
-  _ParsedError._({
-    required this.code,
-    required this.message,
-  });
-
-  factory _ParsedError(_RequestError error) {
-    final matches = RegExp(r'\{.*\}').firstMatch(error.message);
-    final group = matches?.group(0);
-
-    if(group == null) {
-      return _ParsedError._(
-        code: error.code,
-        message: error.message,
-      );
-    } else {
-      final result = json.decode(group);
-      print(error.message);
-      print(result);
-      if (result['value']?['data']?['code'] == null || result['value']?['data']?['message'] == null) {
-        throw Exception('Web3Ethereum: _parseErrorMessagefailure');
-      }
-      return _ParsedError._(
-        code: result['value']['data']['code']!,
-        message: result['value']['data']['message']!,
-      );
-    }
-  }
-}
+//
+// /// Convert JS object to Dart object to avoid type error.
+// class _ParsedError {
+//   final int code;
+//   final String message;
+//   final dynamic data;
+//
+//   _ParsedError._({
+//     required this.code,
+//     required this.message,
+//     required this.data,
+//   });
+//
+//   factory _ParsedError(_RequestError error) {
+//     final matches = RegExp(r'\{.*\}').firstMatch(error.message);
+//     final group = matches?.group(0);
+//
+//     if(group == null) {
+//       return _ParsedError._(
+//         code: error.code,
+//         message: error.message,
+//         data: error.data,
+//       );
+//     } else {
+//       final result = json.decode(group);
+//       if (result['value']?['data']?['code'] == null || result['value']?['data']?['message'] == null) {
+//         throw Exception('Web3Ethereum: _parseErrorMessagefailure');
+//       }
+//       return _ParsedError._(
+//         code: result['value']['data']['code']!,
+//         message: result['value']['data']['message']!,
+//         message: result['value']['data']['message']!,
+//       );
+//     }
+//   }
+// }

@@ -30,11 +30,14 @@ class _RequestArguments {
 @anonymous
 class _RequestError {
   external factory _RequestError({
-    required String code,
+    required int code,
     required String message,
+    required dynamic data,
   });
 
   external int get code;
 
   external String get message;
+
+  external dynamic get data;
 }

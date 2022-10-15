@@ -15,11 +15,7 @@ class Web3Ethereum {
 
   /// Default constructor
   /// If the ethereum object is not available on the page, it will throw an exception
-  Web3Ethereum() {
-    if(!isSupported) {
-      throw Exception('ethereum not found on page');
-    }
-  }
+  Web3Ethereum() {}
 
   /// Getting an ethereum object.
   /// Use it only after getting true from Web3Ethereum.isSupported
@@ -33,11 +29,12 @@ class Web3Ethereum {
         method: method,
         params: _parseDartParamsToJs(params ?? []),
       )));
-    } catch(error) {
-      final parsedError = _ParsedError(error as _RequestError);
+    } catch(e) {
+      final error = e as _RequestError;
       throw Web3EthereumException(
-        code: parsedError.code,
-        message: parsedError.message,
+        code: error.code,
+        message: error.message,
+        data: error.data,
       );
     }
   }
