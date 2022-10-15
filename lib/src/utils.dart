@@ -5,11 +5,15 @@ part of 'web3_ethereum.dart';
 Object _parseDartParamsToJs(List<dynamic> params) {
   return [
     ...params.where(_nullToUndefinedFilter).map((param) {
-      if (param is Map) return _mapToJSObj(param);
-      if (param is List) return [...param.where(_nullToUndefinedFilter)];
-      return param;
+      return _parseParam(param);
     })
   ];
+}
+
+Object _parseParam(Object param) {
+  if(param is Map) return _mapToJSObj(param);
+  if (param is List) return [...param.where(_nullToUndefinedFilter).map((item) => _parseParam(item))];
+  return param;
 }
 
 /// Creates a vanilla literal JavaScript object from a Dart Map
@@ -20,7 +24,7 @@ Object _mapToJSObj(Map<dynamic, dynamic> a) {
     var key = k;
     var value = v;
     if (_nullToUndefinedFilter(value)) {
-      setProperty(object, key, value);
+      setProperty(object, key, _parseParam(value));
     }
   });
   return object;
