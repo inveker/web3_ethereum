@@ -1,9 +1,8 @@
-import 'dart:convert';
+import 'dart:async';
 
 import 'package:js/js.dart';
 import 'package:js/js_util.dart';
 import 'package:web3_ethereum/src/exceptions.dart';
-import 'package:web3_ethereum/src/wallet_types.dart';
 
 part 'ethereum_js.dart';
 part 'utils.dart';
@@ -11,15 +10,36 @@ part 'utils.dart';
 /// Facade to ethereum JavaScript object
 class Web3Ethereum {
   /// If the [ethereum] object is present, then the user has a web3 wallet
-  static bool get isSupported => _ethereumJs != null;
-
-  /// Default constructor
-  /// If the ethereum object is not available on the page, it will throw an exception
-  Web3Ethereum() {}
+  static bool get isInstalled => _ethereumJs != null && (_ethereumJs!.isMetaMask ?? false);
 
   /// Getting an ethereum object.
   /// Use it only after getting true from Web3Ethereum.isSupported
-  _EthereumJs get _ethereum => _ethereumJs!;
+  _EthereumJs get _ethereum => isInstalled ? _ethereumJs! : (throw Exception('Web3Ethereum not supported on this platform'));
+
+  /// Controller that dispatches events when the accountsChanged event fires
+  final StreamController<List<String>> _accountChangedController = StreamController.broadcast();
+
+  /// Controller that dispatches events when the chainChanged event fires
+  final StreamController<int> _chainChangedController = StreamController.broadcast();
+
+  /// Broadcast stream from accountsChanged events
+  Stream<List<String>> get accountChangedStream => _accountChangedController.stream;
+
+  /// Broadcast stream from chainChanged events
+  Stream<int> get chainChangedStream => _chainChangedController.stream;
+
+  /// Constructor
+  Web3Ethereum() {
+    // Init event handlers
+    if(isInstalled) {
+      _ethereum.on('accountsChanged', (List<String> accounts) {
+        _accountChangedController.add(accounts);
+      });
+      _ethereum.on('chainChanged', (int chainId) {
+        _chainChangedController.add(chainId);
+      });
+    }
+  }
 
   /// Call ethereum.request(args)
   /// Processes input parameters by casting them to vanilla JavaScript entities
@@ -65,13 +85,5 @@ class Web3Ethereum {
   Future<bool> isConnected() async {
     final accounts = await getAccounts();
     return accounts.isNotEmpty;
-  }
-
-  /// Asks the ethereum object what type of wallet
-  /// retruns [walletType]
-  Web3EthereumWalletTypes getWalletType() {
-    if (_ethereum.isMetaMask ?? false) return Web3EthereumWalletTypes.metamask;
-    if (_ethereum.isCoinbaseWallet ?? false) return Web3EthereumWalletTypes.coinbase;
-    return Web3EthereumWalletTypes.undefined;
   }
 }

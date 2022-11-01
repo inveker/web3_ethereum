@@ -9,9 +9,9 @@ external _EthereumJs? get _ethereumJs;
 class _EthereumJs {
   external bool? get isMetaMask;
 
-  external bool? get isCoinbaseWallet;
-
   external Object request(_RequestArguments args);
+
+  external on(String eventName, Function listener);
 }
 
 /// ethereum.request(args) method arguments
