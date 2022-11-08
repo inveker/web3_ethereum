@@ -32,12 +32,12 @@ class Web3Ethereum {
   Web3Ethereum() {
     // Init event handlers
     if(isInstalled) {
-      _ethereum.on('accountsChanged', (List<String> accounts) {
-        _accountChangedController.add(accounts);
-      });
-      _ethereum.on('chainChanged', (int chainId) {
-        _chainChangedController.add(chainId);
-      });
+      _ethereum.on('accountsChanged', allowInterop((List accounts) {
+        _accountChangedController.add(accounts.cast<String>());
+      }));
+      _ethereum.on('chainChanged', allowInterop((String chainId) {
+        _chainChangedController.add(int.parse(chainId));
+      }));
     }
   }
 
